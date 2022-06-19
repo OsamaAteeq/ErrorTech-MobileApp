@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1019216492353",
+    "firebase_url": "https://errortech-760ff-default-rtdb.firebaseio.com",
+    "project_id": "errortech-760ff",
+    "storage_bucket": "errortech-760ff.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1019216492353:android:9c812de65b7a1132ca53c0",
+        "android_client_info": {
+          "package_name": "com.errortech"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1019216492353-756b203c8gamqhmc5s60ho0pglgjqd43.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAB7iXkgeWvQDKY3J-Kws1RjM_URW2ex6E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1019216492353-756b203c8gamqhmc5s60ho0pglgjqd43.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
