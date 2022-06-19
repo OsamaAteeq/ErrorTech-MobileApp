@@ -14,7 +14,7 @@ var w_width = Dimensions.get('window').width;
   var b_width = size/2;
   var i_height = b_width-(b_width/5);
 
-  const [name, setName] = useState('');m
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [fblink, setFblink] = useState('');
