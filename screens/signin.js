@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { TextInput, Button, IconButton } from 'react-native-paper';
 import { View, Text, Pressable, Alert, Dimensions, ScrollView} from 'react-native'
 import { AuthContext } from '../Files/AuthProvider';

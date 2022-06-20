@@ -1,9 +1,10 @@
-import React, {  useContext } from 'react';
+import React, {  Component, useEffect, useState } from 'react';
 import { View, Text, DevSettings, Dimensions, ScrollView} from 'react-native'
 import { Button } from 'react-native-paper';
+
+//import {getSeller} from '../Files/SellerApi'
 import { AuthContext } from '../Files/AuthProvider';
 
-import storage from '@react-native-firebase/storage';
 
 
 function sellers ({navigation}) {
@@ -11,6 +12,24 @@ function sellers ({navigation}) {
 var w_width = Dimensions.get('window').width;
   var size = w_width<w_height? w_width:w_height;
   var b_width = size/2;
+
+  const [sellerList,setSellerList] = useState([]);
+
+  onSellerAdded = (seller)=>
+  {
+    console.log("Seller Added");
+    console.log(seller)
+  }
+
+  onSellersRecieved = (sellerList) =>
+  {
+    console.log(sellerList);
+    setSellerList(sellerList)
+  }
+
+  useEffect(() => {
+   // getSeller(this.onSellersRecieved);
+  }, []);
 
     return (
         <ScrollView style={{flex:1, backgroundColor:"#2D2D2D"}}>

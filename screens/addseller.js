@@ -1,11 +1,14 @@
 import React,{ useContext, useState } from 'react';
 import { View, Text,Alert , DevSettings, Dimensions, ScrollView, Pressable, Image} from 'react-native'
-import { Button, TextInput } from 'react-native-paper';
-import { AuthContext } from '../Files/AuthProvider';
+import { Button, TextInput, Checkbox, ActivityIndicator, MD2Colors} from 'react-native-paper';
 import ImagePicker from 'react-native-image-crop-picker';
+import 'react-native-get-random-values'
 
-import storage from '@react-native-firebase/storage';
+import { collection, addDoc, doc, setDoc, loadBundle} from "firebase/firestore";
 
+import storage, { firebase } from '@react-native-firebase/storage';
+import {ref, uploadBytes} from 'firebase/storage'
+import { v4 as uuid } from 'uuid'
 
 function addseller ({navigation}) {
   var w_height = Dimensions.get('window').height;
@@ -19,8 +22,83 @@ var w_width = Dimensions.get('window').width;
   const [phone, setPhone] = useState('');
   const [fblink, setFblink] = useState('');
   const [replink, setReplink] = useState('');
-  const [img, setImg] = useState(null);
   const [comp, setComp] = useState(false);
+
+  const [img, setImg] = useState(null);
+  const [path, setPath] = useState("");
+
+  const [uploading, setUploading] = useState(false);
+
+  const clear = ()=>
+  {
+    setComp(false); setEmail("");setFblink("");setImg(null);setPhone("");setReplink("");setName("");setPath("");
+  }
+
+  const check= async()=>{
+    if(name==""|| (email==""&&phone==""&&fblink==""))
+    {
+      Alert.alert("Can not add seller","Name and a form of contact is a must");
+    }
+    else
+    {
+      if(path!=""){
+      const uploaduri = path;
+      let filename = (uploaduri).substring((uploaduri).lastIndexOf('/')+1);
+      console.log('images/Sellers/'+filename);
+      setUploading(true)
+
+      const task = storage().ref('images/Sellers/'+filename).putFile(uploaduri);
+
+        task.on('state_changed', taskSnapshot=>{})
+
+      try{
+        await task;
+        setUploading(false);
+        Alert.alert("Success", "Document added")
+      }
+      catch(e){console.log(e)}
+      console.log('images/Sellers/'+filename);
+      
+      
+
+      //uploadBytes(imageRef, uploaduri).then(()=>{
+        //Alert.alert("Success","Image uploaded as "+filename+" : "+uploaduri)
+        //console.log("Success","Image uploaded as "+filename+" : "+uploaduri)
+      //})
+      
+    }
+      
+      /*
+      setUploading(true);
+      try
+      {
+        storage().ref(filename).putFile(uploaduri);
+        Alert.alert("Success","Image uploaded as "+filename+" : "+uploaduri)
+        console.log("Success","Image uploaded as "+filename+" : "+uploaduri)
+      }catch(err){console.log(err)}
+      setUploading(false);
+
+      console.log(img);
+*/
+      /*addDoc(collection(db, "Sellers"),{
+        name: name,
+        email: email,
+        phone: phone,
+        fblink: fblink,
+        replink: replink,
+        company: comp,
+        image: img
+      }).then(()=>{
+        Alert.alert("Data entered");
+      }).catch((err)=>{
+        Alert.alert("Error occured")
+      });
+    */  
+      clear()
+    }
+    
+  }
+    
 
   const imgpick=()=>{
 
@@ -39,6 +117,9 @@ var w_width = Dimensions.get('window').width;
                 cropping: false
               }).then(image => {
                 console.log(image);
+                setImg({uri: image.path});
+                setPath(image.path);
+                
               });
             }
         }
@@ -48,6 +129,8 @@ var w_width = Dimensions.get('window').width;
             cropping: false,
           }).then(image => {
             console.log(image);
+            setImg({uri: image.path});
+            setPath(image.path);
           });} 
         }
         ]
@@ -59,9 +142,20 @@ function a (){return(<View style={{alignItems:"center", justifyContent:"center" 
 <Text style={{color:"#F5F5F5"}}>Press to select</Text>
 <Text style={{color:"#F5F5F5"}}>display image </Text></View>);}
 
-function b (){return(<View style={{alignItems:"center", justifyContent:"center" ,borderColor:"white", width:b_width, height:i_height, borderRadius:6, borderWidth:2}}>
-<Image source={img} style={{width:b_width, height:i_height}}></Image></View>);}
-
+function b (){
+  return(<View style={{alignItems:"center", justifyContent:"center" ,borderColor:"white", width:b_width, height:i_height, borderRadius:6, borderWidth:2}}>
+<Image source={img} style={{width:b_width, height:i_height}}></Image></View>);
+  
+}
+if(uploading)
+{
+  return(
+  <View style={{flex:1, backgroundColor:"#2D2D2D", justifyContent:"center", alignItems:"center"}}>
+      <ActivityIndicator animating={true} size="large" style={{alignSelf:"center"}} />
+    </View>
+  )
+}
+else{
     return (
         <ScrollView style={{flex:1, backgroundColor:"#2D2D2D"}}>
         <View style={{backgroundColor:"black", alignItems:"center", padding:"2.5%"}}>
@@ -114,7 +208,18 @@ function b (){return(<View style={{alignItems:"center", justifyContent:"center" 
 
       </TextInput>
 
-        <View style={{flexDirection:"row"}}>
+      <View style={{flexDirection:"row"}}>
+      <Text style={{color:"#F5F5F5", marginTop:"1.5%"}}>Is a company : </Text>
+      <Checkbox
+          color="#FDFE02"
+          status={comp ? 'checked' : 'unchecked'}
+            onPress={() => {
+            setComp(!comp);
+      }}>
+      </Checkbox>
+      </View>
+
+        <View style={{flexDirection:"row",marginTop:"10%"}}>
         <Button
           mode="contained"
           style={{
@@ -124,7 +229,7 @@ function b (){return(<View style={{alignItems:"center", justifyContent:"center" 
             borderRadius: 200,
             marginBottom:"10%"
           }}
-          onPress={() => {}}>
+          onPress={() => clear()}>
           <Text style={{color:"black", fontWeight:"bold"}}>CLEAR</Text>
         </Button>
 
@@ -137,7 +242,9 @@ function b (){return(<View style={{alignItems:"center", justifyContent:"center" 
             borderRadius: 200,
             marginBottom:"10%"
           }}
-          onPress={() => {}}>
+          onPress={() => {
+            check()
+            }}>
           <Text style={{color:"black", fontWeight:"bold"}}>ADD</Text>
         </Button>
         </View>
@@ -145,5 +252,6 @@ function b (){return(<View style={{alignItems:"center", justifyContent:"center" 
       </ScrollView>
     )
   }
+}
 
   export default addseller;
