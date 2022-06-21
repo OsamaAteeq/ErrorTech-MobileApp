@@ -1,14 +1,11 @@
-import React,{ useContext, useState } from 'react';
+import React,{ useState } from 'react';
 import { View, Text,Alert , DevSettings, Dimensions, ScrollView, Pressable, Image} from 'react-native'
 import { Button, TextInput, Checkbox, ActivityIndicator, MD2Colors} from 'react-native-paper';
 import ImagePicker from 'react-native-image-crop-picker';
+//import firestore from '@react-native-firebase/firestore';
 import 'react-native-get-random-values'
 
-import { collection, addDoc, doc, setDoc, loadBundle} from "firebase/firestore";
-
-import storage, { firebase } from '@react-native-firebase/storage';
-import {ref, uploadBytes} from 'firebase/storage'
-import { v4 as uuid } from 'uuid'
+import storage from '@react-native-firebase/storage';
 
 function addseller ({navigation}) {
   var w_height = Dimensions.get('window').height;
@@ -41,20 +38,29 @@ var w_width = Dimensions.get('window').width;
     }
     else
     {
+      var url = ""
       if(path!=""){
       const uploaduri = path;
       let filename = (uploaduri).substring((uploaduri).lastIndexOf('/')+1);
+
+        const extension = filename.split('.').pop();
+        const nname = filename.split('.').slice(0,-1).join('.');
+
+        filename = nname+Date.now() + '.' + extension;
+
       console.log('images/Sellers/'+filename);
       setUploading(true)
 
-      const task = storage().ref('images/Sellers/'+filename).putFile(uploaduri);
+      const storageRef = storage().ref('images/Sellers/'+filename);
+      const task = storageRef.putFile(uploaduri);
 
         task.on('state_changed', taskSnapshot=>{})
 
       try{
         await task;
-        setUploading(false);
-        Alert.alert("Success", "Document added")
+
+        url = await storageRef.getDownloadURL();
+        console.log('Image : '+url);
       }
       catch(e){console.log(e)}
       console.log('images/Sellers/'+filename);
@@ -67,7 +73,27 @@ var w_width = Dimensions.get('window').width;
       //})
       
     }
+/*
+    firestore()
+    .collection('Sellers')
+    .add({
+      name: name,
+      email: email,
+      phone: phone,
+      fblink: fblink,
+      replink: replink,
+      company: comp,
+      image: url
+    })
+    .then(() => {
       
+      Alert.alert("Success", "Seller added")
+      clear()
+    }).catch((e)=>{
+      console.log(e);
+      Alert.alert("Failed", "Failed to add seller")
+    }).finally(()=>{setUploading(false)});
+  */    
       /*
       setUploading(true);
       try
@@ -94,7 +120,7 @@ var w_width = Dimensions.get('window').width;
         Alert.alert("Error occured")
       });
     */  
-      clear()
+      
     }
     
   }
